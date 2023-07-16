@@ -79,9 +79,9 @@ USER ${USER}
 WORKDIR /home/${USER}
 
 # dotfiles
-RUN git clone https://github.com/jl178/dotfiles-archlinux.git
-RUN cd dotfiles-archlinux && echo -e "y" | ./install.sh
-RUN rm -rf dotfiles-archlinux
+RUN git clone https://github.com/jl178/dotfiles.git
+RUN cd dotfiles && echo -e "y" | ./install.sh
+RUN rm -rf dotfiles
 
 ## nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
@@ -117,6 +117,13 @@ RUN git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
 
 #neovim config
 RUN git clone https://github.com/jl178/astrovim_config.git ~/.config/nvim/lua/user
+
+# Aliases
+## Anything needing Docker access (host) needs sudo
+RUN echo 'alias docker="sudo docker"' >> ~/.zshrc
+RUN echo 'alias helm="sudo helm"' >> ~/.zshrc
+RUN echo 'alias kubectl="sudo kubectl"' >> ~/.zshrc
+RUN echo 'alias kind="sudo kind"' >> ~/.zshrc
 
 # Set the default command to zsh
 CMD [ "/bin/zsh" ]
