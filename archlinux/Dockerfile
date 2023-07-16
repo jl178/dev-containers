@@ -45,6 +45,7 @@ RUN pacman -S --noconfirm unzip
 RUN pacman -S --noconfirm docker
 RUN pacman -S --noconfirm github-cli
 RUN pacman -S --noconfirm htop
+RUN pacman -S --noconfirm k9s
 
 # Set zsh as default shell
 RUN chsh -s /bin/zsh
@@ -87,20 +88,24 @@ RUN git clone https://github.com/jl178/dotfiles.git
 RUN cd dotfiles && echo -e "y" | ./install.sh
 RUN rm -rf dotfiles
 
+# Change default shell for all future commands
+SHELL [ "/bin/zsh", "-c" ]
+ENV SHELL=/bin/zsh
+
 ## nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 RUN echo 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"' >> ~/.zshrc 
 RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.zshrc
 
 ## node install
-RUN /bin/zsh -c "source ~/.zshrc && nvm install $NODE_VERSION"
+RUN source ~/.zshrc && nvm install $NODE_VERSION
 
 ## python install
 RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc 
 RUN echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc 
 RUN echo 'eval "$(pyenv init -)"' >> ~/.zshrc
 
-RUN /bin/zsh -c "source ~/.zshrc && pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION && pyenv install 3.7.10"
+RUN source ~/.zshrc && pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION && pyenv install 3.7.10
 
 # java version switcher (via jenv)
 RUN git clone https://github.com/jenv/jenv.git ~/.jenv
@@ -108,7 +113,7 @@ RUN echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.bash_profile
 RUN echo 'eval "$(jenv init -)"' >> ~/.bash_profile 
 RUN echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc
 RUN echo 'eval "$(jenv init -)"' >> ~/.zshrc
-RUN /bin/zsh -c "source ~/.zshrc && jenv enable-plugin export"
+RUN source ~/.zshrc && jenv enable-plugin export
 
 # GCloud CLI
 RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-x86_64.tar.gz
