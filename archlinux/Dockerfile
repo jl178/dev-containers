@@ -11,7 +11,8 @@ ENV USER=$username \
     NODE_VERSION=18 \
     PYTHON_VERSION=3.9.6 \
     SHELL=/bin/zsh \
-    TERRAFORM_VERSION=1.3.6
+    TERRAFORM_VERSION=1.3.6 \
+    LC_CTYPE=en_US.UTF-8
 
 # Update system and install dependencies
 RUN pacman -Syu --noconfirm 
@@ -71,6 +72,9 @@ RUN mv ./kind /usr/local/bin/kind
 # Helm
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+# Locale
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+
 # Docker config
 RUN usermod -aG docker $USER
 
@@ -124,6 +128,9 @@ RUN echo 'alias docker="sudo docker"' >> ~/.zshrc
 RUN echo 'alias helm="sudo helm"' >> ~/.zshrc
 RUN echo 'alias kubectl="sudo kubectl"' >> ~/.zshrc
 RUN echo 'alias kind="sudo kind"' >> ~/.zshrc
+
+# Git configs
+RUN git config --global --add safe.directory '*'
 
 # Set the default command to zsh
 CMD [ "/bin/zsh" ]
