@@ -26,7 +26,6 @@ RUN echo '%wheel ALL=(ALL) ALL' | EDITOR='tee -a' visudo
 # Set timestamp timeout
 RUN echo 'Defaults timestamp_timeout=15' | EDITOR='tee -a' visudo
 
-
 # AUR packages
 RUN pacman -S --noconfirm git
 RUN pacman -S --noconfirm curl
@@ -56,17 +55,29 @@ RUN ln -s ~/.tfenv/bin/* /usr/local/bin
 RUN tfenv install $TERRAFORM_VERSION
 
 # AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
+    fi
 RUN unzip awscliv2.zip
 RUN ./aws/install
 RUN rm -rf awscliv2 && rm awscliv2.zip
 
 # Kubectl
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"; \
+    fi
 RUN install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 # Kind
-RUN [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-arm64; \
+    fi
 RUN chmod +x ./kind
 RUN mv ./kind /usr/local/bin/kind
 
@@ -116,10 +127,18 @@ RUN echo 'eval "$(jenv init -)"' >> ~/.zshrc
 RUN source ~/.zshrc && jenv enable-plugin export
 
 # GCloud CLI
-RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-x86_64.tar.gz
-RUN tar -xf google-cloud-cli-437.0.1-linux-x86_64.tar.gz
-RUN ./google-cloud-sdk/install.sh
-RUN rm google-cloud-cli-437.0.1-linux-x86_64.tar.gz
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-x86_64.tar.gz; \
+    tar -xf google-cloud-sdk-437.0.1-linux-x86_64.tar.gz; \
+    ./google-cloud-sdk/install.sh; \
+    rm google-cloud-cli-437.0.1-linux-x86_64.tar.gz; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+    curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-arm.tar.gz; \
+    tar -xf google-cloud-sdk-437.0.1-linux-arm.tar.gz; \
+    ./google-cloud-sdk/install.sh; \
+    rm google-cloud-cli-437.0.1-linux-arm.tar.gz; \
+    fi
+
 
 # Astrovim
 RUN git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
