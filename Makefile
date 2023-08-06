@@ -27,12 +27,12 @@ run:
 		echo "Container does not exist. Running..."; \
 		docker run \
 			--name $(distro) \
-			--network=host \
 			-h $(distro) \
 			-v ${HOME}/workplace/:/home/$$username/workplace \
 			-v $(vol):/home/$$username \
 			-v "//var/run/docker.sock://var/run/docker.sock" \
 			-v ${HOME}:/home/$$username/host/ \
+			-p 3000-3005:3000-3005 \
 			-it $(img); \
 	fi
 remove:

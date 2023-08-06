@@ -45,14 +45,16 @@ RUN pacman -S --noconfirm docker
 RUN pacman -S --noconfirm github-cli
 RUN pacman -S --noconfirm htop
 RUN pacman -S --noconfirm k9s
+RUN pacman -S --noconfirm go
 
 # Set zsh as default shell
 RUN chsh -s /bin/zsh
 
 # terraform (via tfenv)
-RUN git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
-RUN ln -s ~/.tfenv/bin/* /usr/local/bin
+RUN git clone --depth=1 https://github.com/tfutils/tfenv.git /home/${username}/.tfenv
+RUN ln -s /home/${username}/.tfenv/bin/* /usr/local/bin
 RUN tfenv install $TERRAFORM_VERSION
+RUN tfenv use $TERRAFORM_VERSION
 
 # AWS CLI
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
