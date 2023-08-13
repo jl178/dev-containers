@@ -12,7 +12,8 @@ ENV USER=$username \
     PYTHON_VERSION=3.9.6 \
     SHELL=/bin/zsh \
     TERRAFORM_VERSION=1.3.6 \
-    LC_CTYPE=en_US.UTF-8
+    LC_CTYPE=en_US.UTF-8 \
+    TERM=screen-256color
 
 # Update system and install dependencies
 RUN pacman -Syu --noconfirm 
