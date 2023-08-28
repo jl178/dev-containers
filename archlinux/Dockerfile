@@ -143,12 +143,6 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     fi
 
 
-# Astrovim
-RUN git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
-
-#neovim config
-RUN git clone https://github.com/jl178/astrovim_config.git ~/.config/nvim/lua/user
-
 # Aliases
 ## Anything needing Docker access (host) needs sudo
 RUN echo 'alias docker="sudo docker"' >> ~/.zshrc
